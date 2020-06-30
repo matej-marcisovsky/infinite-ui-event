@@ -1,0 +1,41 @@
+{
+  "name": "infinite-ui-event",
+  "version": "1.0.0",
+  "description": "Fast and lightweight library for subscription to UI browser events.",
+  "main": "index.js",
+  "module": "index.es.js",
+  "scripts": {
+    "build:commonjs": "cross-env NODE_ENV=cjs rollup -c -o index.js",
+    "build:es": "cross-env NODE_ENV=es rollup -c -o index.es.js",
+    "build": "npm run build:commonjs && npm run build:es"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/matej-marcisovsky/infinite-ui-event.git"
+  },
+  "keywords": [
+    "addEventListener",
+    "UI",
+    "subscribe",
+    "event"
+  ],
+  "author": "Matěj Marčišovský",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/matej-marcisovsky/infinite-ui-event/issues"
+  },
+  "homepage": "https://github.com/matej-marcisovsky/infinite-ui-event#readme",
+  "dependencies": {
+    "infinite-circle": "^0.2.6"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.10.3",
+    "@babel/plugin-external-helpers": "^7.10.1",
+    "cross-env": "^7.0.2",
+    "rollup": "^2.18.1",
+    "rollup-plugin-babel": "^4.4.0",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-uglify": "^6.0.4"
+  }
+}
