@@ -28,25 +28,25 @@ const getResizeInfo = (function () {
   let lastWidth, lastHeight;
 
   return function () {
-    const width = window.innerWidth;
     const height = window.innerHeight;
+    const width = window.innerWidth;
     const delta = {
       width: width - (lastWidth || 0),
       height: height - (lastHeight || 0),
     };
 
     // Prevent delta from being 0
-    if (lastWidth !== width) {
-      lastWidth = width;
-    }
     if (lastHeight !== height) {
       lastHeight = height;
     }
+    if (lastWidth !== width) {
+      lastWidth = width;
+    }
 
     return {
-      width,
-      height,
       delta,
+      height,
+      width,
     };
   };
 })();
