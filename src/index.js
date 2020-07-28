@@ -1,8 +1,12 @@
 import { Circle, Infinite } from 'infinite-circle';
 
+const DEFAULT_INTERVAL = 50;
+
 const circles = new Map();
 const infinite = new Infinite();
 const listeners = new Map();
+
+let scrollInfo, resizeInfo;
 
 function addCircle(eventType) {
   if (circles.has(eventType)) {
@@ -17,6 +21,28 @@ function addCircle(eventType) {
       window.removeEventListener(eventType, notify);
     },
   });
+
+  if (eventType === 'scroll') {
+    circle.register({
+      meta: {
+        interval: DEFAULT_INTERVAL,
+      },
+      read: () => {
+        scrollInfo = getScrollInfo();
+      },
+    });
+  }
+
+  if (eventType === 'resize') {
+    circle.register({
+      meta: {
+        interval: DEFAULT_INTERVAL,
+      },
+      read: () => {
+        resizeInfo = getResizeInfo();
+      },
+    });
+  }
 
   infinite.add(circle);
   circles.set(eventType, circle);
@@ -76,7 +102,7 @@ function subscribe(eventType, callback, options = {}) {
 
   const id = circle.register({
     meta: {
-      interval: options.throttleRate || 50,
+      interval: options.throttleRate || DEFAULT_INTERVAL,
     },
     read: () => {
       const payload = {
@@ -84,11 +110,11 @@ function subscribe(eventType, callback, options = {}) {
       };
 
       if (eventType === 'scroll' || eventType === 'touchmove') {
-        payload.scroll = getScrollInfo();
+        payload.scroll = scrollInfo;
       }
 
       if (eventType === 'resize') {
-        payload.resize = getResizeInfo();
+        payload.resize = resizeInfo;
       }
 
       return payload;
