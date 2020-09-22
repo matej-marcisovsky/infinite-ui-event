@@ -82,7 +82,7 @@ const getScrollInfo = (function () {
 
   return function () {
     // Handle negative scrolling on mobile devices
-    const top = Math.max(0, window.scrollY);
+    const top = Math.max(0, window.scrollY || window.pageYOffset);
     const delta = top - (lastTop || 0);
 
     // Prevent delta from being 0
