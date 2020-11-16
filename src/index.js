@@ -6,11 +6,13 @@ const circles = new Map();
 const infinite = new Infinite();
 const listeners = new Map();
 
-let scrollInfo, resizeInfo;
+const scrollInfo = new Map();
+const resizeInfo = new Map();
 
-function addCircle(eventType) {
-  if (circles.has(eventType)) {
-    return circles.get(eventType);
+function addCircle(eventType, interval) {
+  const circleKey = eventType + '_' + interval;
+  if (circles.has(circleKey)) {
+    return circles.get(circleKey);
   }
 
   const circle = new Circle({
@@ -25,10 +27,10 @@ function addCircle(eventType) {
   if (eventType === 'scroll') {
     circle.register({
       meta: {
-        interval: DEFAULT_INTERVAL,
+        interval,
       },
       read: () => {
-        scrollInfo = getScrollInfo();
+        scrollInfo.set(interval, getScrollInfo());
       },
     });
   }
@@ -36,16 +38,16 @@ function addCircle(eventType) {
   if (eventType === 'resize') {
     circle.register({
       meta: {
-        interval: DEFAULT_INTERVAL,
+        interval,
       },
       read: () => {
-        resizeInfo = getResizeInfo();
+        resizeInfo.set(interval, getResizeInfo());
       },
     });
   }
 
   infinite.add(circle);
-  circles.set(eventType, circle);
+  circles.set(circleKey, circle);
 
   return circle;
 }
@@ -98,11 +100,12 @@ const getScrollInfo = (function () {
 })();
 
 function subscribe(eventType, callback, options = {}) {
-  const circle = addCircle(eventType);
+  const interval = options.throttleRate || DEFAULT_INTERVAL;
+  const circle = addCircle(eventType, interval);
 
   const id = circle.register({
     meta: {
-      interval: options.throttleRate || DEFAULT_INTERVAL,
+      interval,
     },
     read: () => {
       const payload = {
@@ -110,11 +113,11 @@ function subscribe(eventType, callback, options = {}) {
       };
 
       if (eventType === 'scroll' || eventType === 'touchmove') {
-        payload.scroll = scrollInfo;
+        payload.scroll = scrollInfo.get(interval);
       }
 
       if (eventType === 'resize') {
-        payload.resize = resizeInfo;
+        payload.resize = resizeInfo.get(interval);
       }
 
       return payload;
@@ -135,7 +138,11 @@ function subscribe(eventType, callback, options = {}) {
 function unsubscribe(eventType, callback) {
   for (const { key, value } of listeners.entries()) {
     if (value.eventType === eventType && value.callback === callback) {
-      circles.get(eventType).unregister(key);
+      circles.forEach(function (circle, circleKey) {
+        if (circleKey.indexOf(eventType + '_') === 0) {
+          circle.unregister(key);
+        }
+      });
     }
   }
 }
